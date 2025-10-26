@@ -77,9 +77,10 @@ const App = () => {
   };
 
   const handleOpen = (bookmark: Bookmark) => {
-    const targetUrl = bookmark.source
-      ? bookmark.source
-      : `https://x.com/i/web/status/${bookmark.tweetId}`;
+    const targetUrl =
+      bookmark.fxUrl ??
+      bookmark.source ??
+      `https://fxtwitter.com/i/status/${bookmark.tweetId}`;
 
     window.open(targetUrl, "_blank", "noopener");
 

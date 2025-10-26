@@ -3,6 +3,14 @@ export interface Bookmark {
   tweetId: string;
   title: string | null;
   source: string | null;
+  fxUrl: string | null;
+  text: string | null;
+  authorName: string | null;
+  authorUsername: string | null;
+  authorAvatarUrl: string | null;
+  thumbnailUrl: string | null;
+  mediaUrls: string[];
+  metrics: Record<string, number> | null;
   readAt: string | null;
   isRead: boolean;
   createdAt: string;

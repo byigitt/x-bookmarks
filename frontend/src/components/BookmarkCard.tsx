@@ -9,6 +9,9 @@ interface BookmarkCardProps {
 
 const BookmarkCard = ({ bookmark, onOpen, onToggleRead }: BookmarkCardProps) => {
   const isRead = bookmark.isRead;
+  const displayTitle = bookmark.title ?? bookmark.text ?? `Tweet ${bookmark.tweetId}`;
+  const displayText = bookmark.text ?? bookmark.title;
+  const primaryImage = bookmark.thumbnailUrl ?? bookmark.mediaUrls[0] ?? null;
 
   const cardClasses = [
     "flex",
@@ -31,10 +34,25 @@ const BookmarkCard = ({ bookmark, onOpen, onToggleRead }: BookmarkCardProps) => 
 
   return (
     <article className={cardClasses} onClick={() => onOpen(bookmark)}>
-      <header className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-slate-900">
-          {bookmark.title ?? `Tweet ${bookmark.tweetId}`}
-        </h2>
+      <header className="flex items-start justify-between">
+        <div className="flex items-center gap-3">
+          {bookmark.authorAvatarUrl && (
+            <img
+              src={bookmark.authorAvatarUrl}
+              alt={bookmark.authorName ? `${bookmark.authorName}'s avatar` : "Author avatar"}
+              className="h-12 w-12 rounded-full object-cover shadow-sm"
+            />
+          )}
+          <div className="flex flex-col">
+            <h2 className="text-lg font-semibold text-slate-900">{displayTitle}</h2>
+            {bookmark.authorName && (
+              <span className="text-sm text-slate-600">{bookmark.authorName}</span>
+            )}
+            {bookmark.authorUsername && (
+              <span className="text-xs text-slate-500">@{bookmark.authorUsername}</span>
+            )}
+          </div>
+        </div>
         <span
           className={[
             "rounded-full",
@@ -49,8 +67,39 @@ const BookmarkCard = ({ bookmark, onOpen, onToggleRead }: BookmarkCardProps) => 
         </span>
       </header>
 
-      {bookmark.source && (
-        <p className="text-sm text-slate-600 truncate">{bookmark.source}</p>
+      {displayText && (
+        <p className="text-sm text-slate-700 whitespace-pre-wrap">{displayText}</p>
+      )}
+
+      {primaryImage && (
+        <img
+          src={primaryImage}
+          alt="Tweet media preview"
+          className="w-full rounded-lg border border-slate-200 object-cover"
+        />
+      )}
+
+      {bookmark.metrics && (
+        <ul className="flex flex-wrap gap-4 text-xs text-slate-500">
+          {Object.entries(bookmark.metrics).map(([key, value]) => (
+            <li key={key} className="flex items-center gap-1">
+              <span className="font-semibold text-slate-700">
+                {new Intl.NumberFormat().format(value)}
+              </span>
+              <span>
+                {key === "replies"
+                  ? "Replies"
+                  : key === "retweets"
+                    ? "Retweets"
+                    : key === "likes"
+                      ? "Likes"
+                      : key === "views"
+                        ? "Views"
+                        : key}
+              </span>
+            </li>
+          ))}
+        </ul>
       )}
 
       <footer className="flex items-center justify-between text-sm text-slate-500">
