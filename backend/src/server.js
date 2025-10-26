@@ -14,7 +14,7 @@ const buildServer = () => {
 
   server.register(cors, {
     origin: corsOrigins,
-    methods: ["GET", "POST", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   });
 
   server.register(prismaPlugin);

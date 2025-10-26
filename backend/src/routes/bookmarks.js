@@ -1,3 +1,5 @@
+import fetchTweetMetadata from "../services/tweetMetadata.js";
+
 const bookmarkBodySchema = {
   type: "object",
   required: ["tweetId"],
@@ -16,6 +18,25 @@ const bookmarkResponseSchema = {
     tweetId: { type: "string" },
     title: { type: ["string", "null"] },
     source: { type: ["string", "null"] },
+    fxUrl: { type: ["string", "null"] },
+    text: { type: ["string", "null"] },
+    authorName: { type: ["string", "null"] },
+    authorUsername: { type: ["string", "null"] },
+    authorAvatarUrl: { type: ["string", "null"] },
+    thumbnailUrl: { type: ["string", "null"] },
+    mediaUrls: {
+      type: "array",
+      items: { type: "string" },
+    },
+    metrics: {
+      anyOf: [
+        { type: "null" },
+        {
+          type: "object",
+          additionalProperties: { type: "number" },
+        },
+      ],
+    },
     readAt: { type: ["string", "null"] },
     isRead: { type: "boolean" },
     createdAt: { type: "string" },
@@ -28,6 +49,14 @@ const serializeBookmark = (bookmark) => ({
   tweetId: bookmark.tweetId,
   title: bookmark.title,
   source: bookmark.source,
+  fxUrl: bookmark.fxUrl,
+  text: bookmark.text,
+  authorName: bookmark.authorName,
+  authorUsername: bookmark.authorUsername,
+  authorAvatarUrl: bookmark.authorAvatarUrl,
+  thumbnailUrl: bookmark.thumbnailUrl,
+  mediaUrls: bookmark.mediaUrls ?? [],
+  metrics: bookmark.metrics,
   readAt: bookmark.readAt ? bookmark.readAt.toISOString() : null,
   isRead: Boolean(bookmark.readAt),
   createdAt: bookmark.createdAt.toISOString(),
@@ -69,10 +98,33 @@ const registerRoutes = async (fastify) => {
     async (request, reply) => {
       const { tweetId, title, source } = request.body;
 
+      const metadata = await fetchTweetMetadata({ tweetId, sourceUrl: source });
+      const mediaUrls = metadata.mediaUrls ?? [];
+      const metadataFields = {
+        fxUrl: metadata.fxUrl,
+        text: metadata.text,
+        authorName: metadata.authorName,
+        authorUsername: metadata.authorUsername,
+        authorAvatarUrl: metadata.authorAvatarUrl,
+        thumbnailUrl: metadata.thumbnailUrl,
+        metrics: metadata.metrics,
+      };
+
       const bookmark = await fastify.prisma.bookmark.upsert({
         where: { tweetId },
-        update: { title, source },
-        create: { tweetId, title, source },
+        update: {
+          title,
+          source,
+          ...metadataFields,
+          mediaUrls: { set: mediaUrls },
+        },
+        create: {
+          tweetId,
+          title,
+          source,
+          ...metadataFields,
+          mediaUrls,
+        },
       });
 
       return serializeBookmark(bookmark);
