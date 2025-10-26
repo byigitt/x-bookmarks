@@ -12,6 +12,7 @@ model Bookmark {
   tweetId   String   @unique
   title     String?
   source    String?
+  readAt    DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
