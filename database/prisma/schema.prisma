@@ -12,6 +12,14 @@ model Bookmark {
   tweetId   String   @unique
   title     String?
   source    String?
+  fxUrl     String?
+  text      String?
+  authorName        String?
+  authorUsername    String?
+  authorAvatarUrl   String?
+  thumbnailUrl      String?
+  mediaUrls         String[] @default([])
+  metrics            Json?
   readAt    DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
