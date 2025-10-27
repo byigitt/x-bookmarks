@@ -35,6 +35,29 @@ pnpm --filter frontend dev
 ```
 The Vite dev server listens on `http://localhost:5173`. Set `VITE_API_BASE_URL` in `frontend/.env` (or via your shell) so the frontend can reach the backend, for example `http://localhost:3000`.
 
+## Reminder Scheduler
+The `cron` workspace sends reminders for bookmarks that remain unread beyond a configurable threshold.
+
+### Configuration
+- Copy `cron/.env.example` to `cron/.env` (or export the variables) and set:
+  - `DATABASE_URL` so the scheduler can reach the same PostgreSQL instance as the backend.
+  - `DISCORD_WEBHOOK_URL` pointing to the Discord channel that should receive reminders.
+  - Optional knobs such as `CRON_SCHEDULE`, `REMINDER_THRESHOLD_HOURS`, `REMINDER_BATCH_SIZE`, and `RUN_JOB_ON_STARTUP`.
+- Run database migrations so the `Bookmark` table includes `lastReminderSentAt`.
+
+### Running the Scheduler
+```bash
+pnpm --filter cron start
+```
+The scheduler schedules the job with `node-cron`, executes it immediately on startup (unless `RUN_JOB_ON_STARTUP=false`), and keeps the process alive. Use `pnpm --filter cron start -- --run-once` to execute a single reminder run for testing.
+
+## Integrations
+Integration clients live under the `integrations` workspace and are shared by other packages.
+
+- `integrations/src/index.js` exposes a `sendReminder` dispatcher that selects the appropriate client.
+- `integrations/src/discord/webhookClient.js` handles Discord webhooks using the same payload shape as the scheduler.
+- Future services (email, Slack, etc.) can add additional subfolders and register new channels without touching consumers.
+
 ## Seeding the Database
 ```bash
 pnpm --filter database seed
@@ -63,6 +86,7 @@ docker compose up --build
 Services:
 - Backend: <http://localhost:3000>
 - Frontend: <http://localhost:4173>
+- Cron: reminder scheduler (logs to console, requires Discord webhook env)
 - PostgreSQL: available internally as `postgres:5432`
 
 Compose uses a named volume `postgres-data` for persistence. Shut down containers with `Ctrl+C`, then remove everything with:
