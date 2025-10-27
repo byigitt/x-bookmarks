@@ -21,6 +21,7 @@ model Bookmark {
   mediaUrls         String[] @default([])
   metrics            Json?
   readAt    DateTime?
+  lastReminderSentAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
