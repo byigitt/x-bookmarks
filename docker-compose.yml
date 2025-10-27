@@ -44,5 +44,22 @@ services:
       - "4173:4173"
     restart: unless-stopped
 
+  cron:
+    build:
+      context: .
+      dockerfile: docker/cron.Dockerfile
+      target: runner
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/xbookmarks?schema=public
+      DISCORD_WEBHOOK_URL: ${DISCORD_WEBHOOK_URL:-}
+      CRON_SCHEDULE: ${CRON_SCHEDULE:-0 * * * *}
+      REMINDER_THRESHOLD_HOURS: ${REMINDER_THRESHOLD_HOURS:-24}
+      REMINDER_BATCH_SIZE: ${REMINDER_BATCH_SIZE:-10}
+      RUN_JOB_ON_STARTUP: ${RUN_JOB_ON_STARTUP:-true}
+    restart: unless-stopped
+
 volumes:
   postgres-data:
