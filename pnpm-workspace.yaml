@@ -2,3 +2,5 @@ packages:
   - backend
   - database
   - frontend
+  - cron
+  - integrations
