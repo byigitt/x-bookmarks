@@ -1,0 +1,18 @@
+export const serializeBookmark = (bookmark) => ({
+  id: bookmark.id,
+  tweetId: bookmark.tweetId,
+  title: bookmark.title,
+  source: bookmark.source,
+  fxUrl: bookmark.fxUrl,
+  text: bookmark.text,
+  authorName: bookmark.authorName,
+  authorUsername: bookmark.authorUsername,
+  authorAvatarUrl: bookmark.authorAvatarUrl,
+  thumbnailUrl: bookmark.thumbnailUrl,
+  mediaUrls: bookmark.mediaUrls ?? [],
+  metrics: bookmark.metrics,
+  readAt: bookmark.readAt ? bookmark.readAt.toISOString() : null,
+  isRead: Boolean(bookmark.readAt),
+  createdAt: bookmark.createdAt.toISOString(),
+  updatedAt: bookmark.updatedAt.toISOString(),
+});

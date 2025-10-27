@@ -1,7 +1,7 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import prismaPlugin from "./plugins/prisma.js";
-import registerBookmarkRoutes from "./routes/bookmarks.js";
+import registerBookmarkRoutes from "./routes/bookmarks/index.js";
 
 const buildServer = () => {
   const server = Fastify({
